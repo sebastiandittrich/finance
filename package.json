@@ -1,0 +1,19 @@
+{
+    "private": true,
+    "scripts": {
+        "dev": "npm run development",
+        "development": "mix",
+        "watch": "mix watch",
+        "watch-poll": "mix watch -- --watch-options-poll=1000",
+        "hot": "mix watch --hot",
+        "prod": "npm run production",
+        "production": "mix --production",
+        "build-simple-tag-field": "cd nova-components/SimpleTagField && npm run dev",
+        "build-simple-tag-field-prod": "cd nova-components/SimpleTagField && npm run prod"
+    },
+    "devDependencies": {
+        "axios": "^0.21",
+        "lodash": "^4.17.19",
+        "postcss": "^8.1.14"
+    }
+}

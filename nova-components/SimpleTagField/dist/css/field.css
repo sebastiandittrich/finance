@@ -1,0 +1,46 @@
+.mr-2 {
+    margin-right: 0.5rem
+}
+.-mr-2 {
+    margin-right: -0.5rem
+}
+.w-full {
+    width: 100%
+}
+.rounded-full {
+    border-radius: 9999px
+}
+.bg-blue-400 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(96, 165, 250, var(--tw-bg-opacity))
+}
+.bg-blue-100 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(219, 234, 254, var(--tw-bg-opacity))
+}
+.bg-gray-200 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(229, 231, 235, var(--tw-bg-opacity))
+}
+.bg-blue-200 {
+    --tw-bg-opacity: 1;
+    background-color: rgba(191, 219, 254, var(--tw-bg-opacity))
+}
+.px-2 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem
+}
+.py-1 {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem
+}
+.text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem
+}
+.font-bold {
+    font-weight: 700
+}
+.uppercase {
+    text-transform: uppercase
+}
