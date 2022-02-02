@@ -41,14 +41,26 @@ class ImportFromIng extends Action
             ->map(fn (string $row) => str_getcsv($row, ';'))
             ->slice(14)
             ->map(fn (array $row) => [
-                'booked_at' => Carbon::createFromFormat('d.m.Y', $row[0]),
-                'valued_at' => Carbon::createFromFormat('d.m.Y', $row[1]),
+                'booked_at' => Carbon::createFromFormat('d.m.Y', $row[0])->startOfDay()->toDateString(),
+                'valued_at' => Carbon::createFromFormat('d.m.Y', $row[1])->startOfDay()->toDateString(),
                 'recipient' => $row[2],
                 'text' => $row[3],
                 'reason' => $row[4],
                 'amount' => Money::of(Str::replace(',', '.', Str::replace('.', '', $row[7])), $row[8])->getMinorAmount()->toInt(),
                 'currency' => Currency::of($row[8])->getCurrencyCode(),
             ])
+            ->filter(function (array $row) {
+                return Transaction::query()
+                    ->where([
+                        'booked_at' => $row['booked_at'],
+                        'valued_at' => $row['valued_at'],
+                        'recipient' => $row['recipient'],
+                        'text' => $row['text'],
+                        'reason' => $row['reason'],
+                        'amount' => $row['amount'],
+                        'currency' => $row['currency'],
+                    ])->count() === 0;
+            })
             ->values();
 
         $import->transactions()->createMany($data);

@@ -20,6 +20,8 @@ class CreateCostCenterTransactionTable extends Migration
             $table->foreignIdFor(CostCenter::class);
             $table->foreignIdFor(Transaction::class);
             $table->integer('share')->default(1);
+            $table->string('originator_type')->nullable();
+            $table->foreignId('originator_id')->nullable();
             $table->timestamps();
         });
     }

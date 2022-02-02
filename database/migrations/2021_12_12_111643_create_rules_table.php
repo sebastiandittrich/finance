@@ -1,11 +1,12 @@
 <?php
 
 use App\Models\CostCenter;
+use App\Models\Rule;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCostCentersTable extends Migration
+class CreateRulesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,10 +15,10 @@ class CreateCostCentersTable extends Migration
      */
     public function up()
     {
-        Schema::create('cost_centers', function (Blueprint $table) {
+        Schema::create('rules', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignIdFor(CostCenter::class, 'parent_id')->nullable();
+            $table->foreignIdFor(CostCenter::class);
             $table->timestamps();
         });
     }
@@ -29,6 +30,6 @@ class CreateCostCentersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cost_centers');
+        Schema::dropIfExists('cost_center_rule_sets');
     }
 }

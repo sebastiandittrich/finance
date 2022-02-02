@@ -15,6 +15,7 @@
         "laravel/nova": "~3.0",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
+        "lorisleiva/laravel-actions": "^2.2",
         "ninjalabs/simple-tag-field": "*",
         "spatie/laravel-tags": "^4.2",
         "staudenmeir/laravel-adjacency-list": "^1.0"

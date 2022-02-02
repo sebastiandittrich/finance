@@ -16,7 +16,8 @@ class CostCenter extends Model
         return $this
             ->belongsToMany(Transaction::class)
             ->using(CostCenterTransaction::class)
-            ->withPivot('share')
+            ->withPivot('id', 'share')
+            ->withTimestamps()
             ->selectRaw('transactions.*, floor((cost_center_transaction.share / shares.total_share) * transactions.amount) as pivot_amount')
             ->joinSub(CostCenterTransaction::totalSharesQuery(), 'shares', 'shares.transaction_id', '=', 'cost_center_transaction.transaction_id');
     }
@@ -26,8 +27,14 @@ class CostCenter extends Model
         return $this
             ->belongsToManyOfDescendantsAndSelf(Transaction::class)
             ->using(CostCenterTransaction::class)
-            ->withPivot('share')
+            ->withPivot('id', 'share')
+            ->withTimestamps()
             ->selectRaw('transactions.*, floor((cost_center_transaction.share / shares.total_share) * transactions.amount) as pivot_amount')
             ->joinSub(CostCenterTransaction::totalSharesQuery(), 'shares', 'shares.transaction_id', '=', 'cost_center_transaction.transaction_id');
+    }
+
+    public function rules()
+    {
+        return $this->morphMany(Rule::class, 'rulable');
     }
 }

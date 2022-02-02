@@ -2,33 +2,40 @@
 
 namespace App\Nova;
 
+use App\Actions\RunRuleNow;
+use App\Models\Condition as ModelsCondition;
+use App\Models\Rule as ModelsRule;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Fields\MorphTo;
+use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Textarea;
 
-class Import extends Resource
+class Rule extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\Import::class;
+    public static $model = \App\Models\Rule::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
      *
      * @var string
      */
-    public static $title = 'id';
+    public static $title = 'name';
 
     /**
      * The columns that should be searched.
      *
      * @var array
      */
-    public static $search = [];
+    public static $search = [
+        'id',
+    ];
 
     /**
      * Get the fields displayed by the resource.
@@ -40,7 +47,15 @@ class Import extends Resource
     {
         return [
             ID::make(__('ID'), 'id')->sortable(),
-            HasMany::make(__('Transactions'), 'transactions', Transaction::class),
+            Text::make(__('Name'), 'name')->sortable(),
+            MorphTo::make(__('Target'), 'target', CostCenter::class)->showCreateRelationButton()->types([
+                CostCenter::class,
+                VirtualAccount::class,
+            ]),
+            Text::make(__('Human Readable Rule'), function (ModelsRule $rule) {
+                return $rule->conditions->map(fn (ModelsCondition $condition) => "$condition->attribute $condition->operator \"$condition->value\"")->implode(' and ');
+            })->hideFromIndex(),
+            HasMany::make(__('Conditions'), 'conditions', Condition::class),
         ];
     }
 
@@ -85,6 +100,8 @@ class Import extends Resource
      */
     public function actions(Request $request)
     {
-        return [];
+        return [
+            RunRuleNow::nova()
+        ];
     }
 }

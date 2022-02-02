@@ -7,6 +7,8 @@ use Laravel\Nova\Resource as NovaResource;
 
 abstract class Resource extends NovaResource
 {
+    protected static $orderBy = false;
+
     /**
      * Build an "index" query for the given resource.
      *
@@ -57,8 +59,14 @@ abstract class Resource extends NovaResource
         return parent::relatableQuery($request, $query);
     }
 
-    public function detailCards()
+    protected static function applyOrderings($query, array $orderings)
     {
-        return [];
+        if (empty(array_filter($orderings)) && static::$orderBy) {
+            $query->reorder();
+
+            $orderings = static::$orderBy;
+        }
+
+        return parent::applyOrderings($query, $orderings);
     }
 }

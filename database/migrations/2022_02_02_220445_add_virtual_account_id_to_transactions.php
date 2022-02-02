@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\CostCenter;
+use App\Models\VirtualAccount;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCostCentersTable extends Migration
+class AddVirtualAccountIdToTransactions extends Migration
 {
     /**
      * Run the migrations.
@@ -14,11 +14,8 @@ class CreateCostCentersTable extends Migration
      */
     public function up()
     {
-        Schema::create('cost_centers', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->foreignIdFor(CostCenter::class, 'parent_id')->nullable();
-            $table->timestamps();
+        Schema::table('transactions', function (Blueprint $table) {
+            $table->foreignIdFor(VirtualAccount::class)->nullable();
         });
     }
 
@@ -29,6 +26,8 @@ class CreateCostCentersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cost_centers');
+        Schema::table('transactions', function (Blueprint $table) {
+            $table->dropColumn(['virtual_account_id']);
+        });
     }
 }

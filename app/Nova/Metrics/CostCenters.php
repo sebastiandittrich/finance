@@ -23,7 +23,7 @@ class CostCenters extends Partition
         } else {
             $children = CostCenter::isRoot()->get();
         }
-        $result = $children->mapWithKeys(fn (CostCenter $costCenter) => [
+        $result = collect($children)->mapWithKeys(fn (CostCenter $costCenter) => [
             $costCenter->name => abs(intval(DB::table($costCenter->transactionsOfDescendantsAndSelf(), 'all_transactions')->sum('pivot_amount'))) / 100
         ]);
         if (isset($model)) {

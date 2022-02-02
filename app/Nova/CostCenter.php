@@ -3,7 +3,6 @@
 namespace App\Nova;
 
 use App\Models\CostCenter as ModelsCostCenter;
-use App\Models\CostCenterTransaction;
 use App\Models\Transaction;
 use App\Nova\Metrics\AmountTrend;
 use App\Nova\Metrics\CostCenters;
@@ -17,6 +16,7 @@ use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Currency;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\MorphMany;
 use Laravel\Nova\Fields\Text;
 
 class CustomBuilder extends EloquentBuilder
@@ -69,13 +69,14 @@ class CostCenter extends Resource
         return [
             ID::make(__('ID'), 'id')->sortable(),
             Text::make(__('Name'), 'name')->sortable(),
-            BelongsToMany::make('Transactions', 'transactionsOfDescendantsAndSelf', NovaTransaction::class)->fields(function () {
+            BelongsToMany::make('Transactions', 'transactions', NovaTransaction::class)->fields(function () {
                 return [
                     Currency::make(__('Shared Amount'), 'amount')->currency($this->currency ?? 'EUR')->asMinorUnits()->readonly()
                 ];
             }),
             BelongsTo::make('Parent', 'parent', CostCenter::class)->nullable(),
-            HasMany::make('Children', 'children', CostCenter::class)->nullable(),
+            HasMany::make('Children', 'children', CostCenter::class),
+            MorphMany::make('Rules', 'rules', Rule::class),
         ];
     }
 
@@ -88,14 +89,15 @@ class CostCenter extends Resource
     public function cards(Request $request)
     {
         $wrap = fn ($query) => (new CustomBuilder(DB::table($query, 'amounts')))->setModel(Transaction::make());
+        $model = fn () => ModelsCostCenter::find($request->resourceId);
         return [
-            AmountTrend::make(fn () => $wrap(ModelsCostCenter::find($request->resourceId)->transactionsOfDescendantsAndSelf()), 'pivot_amount')
+            AmountTrend::make(fn () => $wrap($model()->transactionsOfDescendantsAndSelf()), 'pivot_amount')
                 ->onlyOnDetail()
                 ->name('Amount Spent')
                 ->uriKey(fn () => "cost-center-spent-{$request->resourceId}")
                 ->defaultRange(12),
             CostCenters::make(),
-            CostCenters::make()->onlyOnDetail(),
+            CostCenters::make()->onlyOnDetail()->canSee(fn ($request) => $model() && $model()->children->count()),
         ];
     }
 

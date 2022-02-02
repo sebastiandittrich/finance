@@ -19,4 +19,19 @@ class CostCenterTransaction extends Pivot
             ->join('transactions', 'cost_center_transaction.transaction_id', '=', 'transactions.id')
             ->groupBy('transaction_id');
     }
+
+    public function originator()
+    {
+        return $this->morphTo();
+    }
+
+    public function costCenter()
+    {
+        return $this->belongsTo(CostCenter::class);
+    }
+
+    public function transaction()
+    {
+        return $this->belongsTo(Transaction::class);
+    }
 }

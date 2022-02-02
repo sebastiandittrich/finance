@@ -2,33 +2,39 @@
 
 namespace App\Nova;
 
+use App\Models\VirtualAccount as ModelsVirtualAccount;
+use App\Nova\Metrics\TotalAmount;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\MorphMany;
+use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class Import extends Resource
+class VirtualAccount extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = \App\Models\Import::class;
+    public static $model = \App\Models\VirtualAccount::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
      *
      * @var string
      */
-    public static $title = 'id';
+    public static $title = 'name';
 
     /**
      * The columns that should be searched.
      *
      * @var array
      */
-    public static $search = [];
+    public static $search = [
+        'id', 'name'
+    ];
 
     /**
      * Get the fields displayed by the resource.
@@ -40,7 +46,9 @@ class Import extends Resource
     {
         return [
             ID::make(__('ID'), 'id')->sortable(),
+            Text::make(__('Name'), 'name')->sortable(),
             HasMany::make(__('Transactions'), 'transactions', Transaction::class),
+            MorphMany::make(__('Rules'), 'rules', Rule::class),
         ];
     }
 
@@ -52,7 +60,9 @@ class Import extends Resource
      */
     public function cards(Request $request)
     {
-        return [];
+        return [
+            TotalAmount::make(fn (NovaRequest $request) => $request->findModelOrFail()->transactions()->getQuery())->onlyOnDetail()->name(__('Virtual Accout Balance'))
+        ];
     }
 
     /**
